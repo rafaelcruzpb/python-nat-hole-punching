@@ -24,7 +24,7 @@ def main(host='45.77.74.113', port=9999):
         print('client received: {} {}'.format(addr, data))
         addr = msg_to_addr(data)
         attempts = 1
-        threading.Thread(target = listen, args = (sock)).start()
+        threading.Thread(target = listen, args = (sock,)).start()
         while attempts < 10:
             print('{} - Sending: {}'.format(attempts, addr))
             sock.sendto(b'0', addr)
