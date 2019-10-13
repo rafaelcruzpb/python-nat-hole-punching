@@ -52,7 +52,7 @@ def connect(local_addr, addr, order):
             logger.info("connected from %s to %s success!", local_addr, addr)
             STOP.set()
             logger.info('ORDER: %s', order)
-            if order == 0:
+            if order == 1:
                 logger.info("Starting as host... port: %s", local_addr[1])
                 subprocess.run(['org.libretro.RetroArch', '--host', '--port={}'.format(local_addr[1]), '-L {}'.format(core_file), rom_file])
             else:
