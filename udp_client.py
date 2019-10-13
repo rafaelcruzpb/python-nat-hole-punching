@@ -50,7 +50,7 @@ def main(host='3.15.42.116', port=5005):
             time.sleep(1)
             attempts+=1
         data, addr = sock.recvfrom(1024)
-        print('client received: {} {}'.format(addr, data))
+        print('client received: {}:{} - {}'.format(addr[0], addr[1], data))
 
 
 if __name__ == '__main__':
