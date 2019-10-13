@@ -50,5 +50,5 @@ def recv_msg(sock):
 class Client(namedtuple('Client', 'conn, pub, priv, order')):
 
     def peer_msg(self):
-        return addr_to_msg(self.pub) + b'|' + addr_to_msg(self.priv) + b'|' + str.encode(self.order)
+        return addr_to_msg(self.pub) + b'|' + addr_to_msg(self.priv) + b'|' + str.encode(str(self.order))
 
