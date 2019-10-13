@@ -42,9 +42,9 @@ def main(host='0.0.0.0', port=5005):
 
         if len(clients) == 2:
             (addr1, c1), (addr2, c2) = clients.items()
-            logger.info('server - send client info to: %s', c1.pub)
+            logger.info('server - send client info to: %s, msg: %s', c1.pub, c2.peer_msg())
             send_msg(c1.conn, c2.peer_msg())
-            logger.info('server - send client info to: %s', c2.pub)
+            logger.info('server - send client info to: %s, msg: %s', c2.pub, c1.peer_msg())
             send_msg(c2.conn, c1.peer_msg())
             clients.pop(addr1)
             clients.pop(addr2)

@@ -57,7 +57,7 @@ def main(host='3.15.42.116', port=5005):
 
     send_msg(sa, addr_to_msg(priv_addr))
     data = recv_msg(sa)
-    logger.info("client %s %s - received data: %s", priv_addr[0], priv_addr[1], data)
+    logger.info("client %s:%s - received data: %s", priv_addr[0], priv_addr[1], data)
     pub_addr = msg_to_addr(data)
     send_msg(sa, addr_to_msg(pub_addr))
 
@@ -70,25 +70,25 @@ def main(host='3.15.42.116', port=5005):
         pub_addr, priv_addr, client_pub_addr, client_priv_addr,
     )
 
-    threads = {
-        '0_accept': Thread(target=accept, args=(priv_addr[1],)),
-        '1_accept': Thread(target=accept, args=(client_pub_addr[1],)),
-        '2_connect': Thread(target=connect, args=(priv_addr, client_pub_addr,)),
-        '3_connect': Thread(target=connect, args=(priv_addr, client_priv_addr,)),
-    }
-    for name in sorted(threads.keys()):
-        logger.info('start thread %s', name)
-        threads[name].start()
+    # threads = {
+    #     '0_accept': Thread(target=accept, args=(priv_addr[1],)),
+    #     '1_accept': Thread(target=accept, args=(client_pub_addr[1],)),
+    #     '2_connect': Thread(target=connect, args=(priv_addr, client_pub_addr,)),
+    #     '3_connect': Thread(target=connect, args=(priv_addr, client_priv_addr,)),
+    # }
+    # for name in sorted(threads.keys()):
+    #     logger.info('start thread %s', name)
+    #     threads[name].start()
 
-    while threads:
-        keys = list(threads.keys())
-        for name in keys:
-            try:
-                threads[name].join(1)
-            except TimeoutError:
-                continue
-            if not threads[name].is_alive():
-                threads.pop(name)
+    # while threads:
+    #     keys = list(threads.keys())
+    #     for name in keys:
+    #         try:
+    #             threads[name].join(1)
+    #         except TimeoutError:
+    #             continue
+    #         if not threads[name].is_alive():
+    #             threads.pop(name)
 
 
 if __name__ == '__main__':

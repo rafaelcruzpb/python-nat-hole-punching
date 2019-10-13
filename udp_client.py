@@ -13,7 +13,7 @@ def listen(sock):
         data, addr = sock.recvfrom(1024)
         print('RECEIVED: {}'.format(addr))
 
-def main(host='3.15.42.116', port=9999):
+def main(host='3.15.42.116', port=5005):
     print('connecting: {}:{}'.format(host, port))
     sock = socket.socket(socket.AF_INET, # Internet
                          socket.SOCK_DGRAM) # UDP
@@ -25,7 +25,7 @@ def main(host='3.15.42.116', port=9999):
         addr = msg_to_addr(data)
         attempts = 1
         threading.Thread(target = listen, args = (sock,)).start()
-        while attempts < 10:
+        while attempts < 100:
             print('{} - Sending: {}'.format(attempts, addr))
             sock.sendto(b'0', addr)
             time.sleep(1)
