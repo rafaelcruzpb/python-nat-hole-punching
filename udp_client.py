@@ -4,14 +4,33 @@ import sys
 import time
 import threading
 from util import *
+import subprocess
 
 logger = logging.getLogger()
+core_file = '/home/$USER/.var/app/org.libretro.RetroArch/config/retroarch/cores/snes9x_libretro.so'
+rom_file = '~/Downloads/sf2.zip'
+cmd_host = 'org.libretro.RetroArch --host --port={} -L {} {}'
+cmd_client = 'org.libretro.RetroArch --connect={} --port={} -L {} {}'
 
 def listen(sock):
     print ("Starting listening...")
     while True:
         data, addr = sock.recvfrom(1024)
         print('RECEIVED: {}'.format(addr))
+        player_addr = msg_to_addr_player(data)
+
+        if player_addr[2] == '1':
+            logger.info("Starting as host... port: %s", sock.getsockname()[1])
+            cmd = cmd_host.format(sock.getsockname()[1], core_file, rom_file)
+            logger.info("Running: {}".format(cmd))
+            p = subprocess.Popen(cmd, shell=True)
+            break
+        else:
+            logger.info("Connecting at host... %s:%s", addr[0], addr[1])
+            cmd = cmd_client.format(addr[0], addr[1], core_file, rom_file)
+            logger.info("Running: {}".format(cmd))
+            p = subprocess.Popen(cmd, shell=True)
+            break
 
 def main(host='3.15.42.116', port=5005):
     print('connecting: {}:{}'.format(host, port))
@@ -25,7 +44,7 @@ def main(host='3.15.42.116', port=5005):
         addr = msg_to_addr(data)
         attempts = 1
         threading.Thread(target = listen, args = (sock,)).start()
-        while attempts < 100:
+        while attempts < 10:
             print('{} - Sending: {}'.format(attempts, addr))
             sock.sendto(b'0', addr)
             time.sleep(1)

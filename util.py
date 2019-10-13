@@ -15,10 +15,15 @@ def msg_to_addr(data):
     ip, port = data.decode('utf-8').strip().split(':')
     return (ip, int(port))
 
+def msg_to_addr_player(data):
+    ip, port, player = data.decode('utf-8').strip().split(':')
+    return (ip, int(port), player)
 
 def addr_to_msg(addr):
     return '{}:{}'.format(addr[0], str(addr[1])).encode('utf-8')
 
+def addr_to_msg_player(addr, player=1):
+    return '{}:{}:{}'.format(addr[0], str(addr[1]), str(player)).encode('utf-8')
 
 def send_msg(sock, msg):
     # Prefix each message with a 4-byte length (network byte order)
