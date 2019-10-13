@@ -17,7 +17,11 @@ def main(host='3.15.42.116', port=5005):
     print('connecting: {}:{}'.format(host, port))
     sock = socket.socket(socket.AF_INET, # Internet
                          socket.SOCK_DGRAM) # UDP
-    sock.sendto(b'0', (host, port))
+    
+    while True:
+        print('sending: {}:{}'.format(host, port))
+        sock.sendto(b'0', (host, port))
+        time.sleep(1)
 
     while True:
         data, addr = sock.recvfrom(1024)

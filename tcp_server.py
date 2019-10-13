@@ -33,7 +33,7 @@ def main(host='0.0.0.0', port=5005):
         data_addr = msg_to_addr(data)
         if data_addr == addr:
             logger.info('client reply matches')
-            clients[addr] = Client(conn, addr, priv_addr)
+            clients[addr] = Client(conn, addr, priv_addr, len(clients))
         else:
             logger.info('client reply did not match')
             conn.close()

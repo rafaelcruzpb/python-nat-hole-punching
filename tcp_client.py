@@ -5,6 +5,7 @@ import socket
 import struct
 from threading import Event, Thread
 from util import *
+import subprocess
 
 
 logger = logging.getLogger('client')
@@ -30,7 +31,10 @@ def accept(port):
             # STOP.set()
 
 
-def connect(local_addr, addr):
+def connect(local_addr, addr, order):
+    core_file = '/home/$USER/.var/app/org.libretro.RetroArch/config/retroarch/cores/snes9x_libretro.so'
+    rom_file = '~/Downloads/sf2.zip'
+
     logger.info("connect from %s to %s", local_addr, addr)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -46,7 +50,11 @@ def connect(local_addr, addr):
         #     break
         else:
             logger.info("connected from %s to %s success!", local_addr, addr)
-            # STOP.set()
+            STOP.set()
+            if order == 0:
+                subprocess.run(['org.libretro.RetroArch', '--host', '--port={}'.format(local_addr[1]), '-L {}'.format(core_file), rom_file])
+            else: 
+                subprocess.run(['org.libretro.RetroArch', '--connect={}'.format(addr[0]), '--port={}'.format(addr[1]), '-L {}'.format(core_file), rom_file])
 
 
 def main(host='3.15.42.116', port=5005):
@@ -62,7 +70,7 @@ def main(host='3.15.42.116', port=5005):
     send_msg(sa, addr_to_msg(pub_addr))
 
     data = recv_msg(sa)
-    pubdata, privdata = data.split(b'|')
+    pubdata, privdata, order = data.split(b'|')
     client_pub_addr = msg_to_addr(pubdata)
     client_priv_addr = msg_to_addr(privdata)
     logger.info(
@@ -70,25 +78,25 @@ def main(host='3.15.42.116', port=5005):
         pub_addr, priv_addr, client_pub_addr, client_priv_addr,
     )
 
-    # threads = {
-    #     '0_accept': Thread(target=accept, args=(priv_addr[1],)),
-    #     '1_accept': Thread(target=accept, args=(client_pub_addr[1],)),
-    #     '2_connect': Thread(target=connect, args=(priv_addr, client_pub_addr,)),
-    #     '3_connect': Thread(target=connect, args=(priv_addr, client_priv_addr,)),
-    # }
-    # for name in sorted(threads.keys()):
-    #     logger.info('start thread %s', name)
-    #     threads[name].start()
+    threads = {
+        '0_accept': Thread(target=accept, args=(priv_addr[1],)),
+        '1_accept': Thread(target=accept, args=(client_pub_addr[1],)),
+        '2_connect': Thread(target=connect, args=(priv_addr, client_pub_addr, order,)),
+        '3_connect': Thread(target=connect, args=(priv_addr, client_priv_addr, order,)),
+    }
+    for name in sorted(threads.keys()):
+        logger.info('start thread %s', name)
+        threads[name].start()
 
-    # while threads:
-    #     keys = list(threads.keys())
-    #     for name in keys:
-    #         try:
-    #             threads[name].join(1)
-    #         except TimeoutError:
-    #             continue
-    #         if not threads[name].is_alive():
-    #             threads.pop(name)
+    while threads:
+        keys = list(threads.keys())
+        for name in keys:
+            try:
+                threads[name].join(1)
+            except TimeoutError:
+                continue
+            if not threads[name].is_alive():
+                threads.pop(name)
 
 
 if __name__ == '__main__':
