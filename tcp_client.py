@@ -49,7 +49,7 @@ def connect(local_addr, addr):
             # STOP.set()
 
 
-def main(host='54.187.46.146', port=5005):
+def main(host='3.15.42.116', port=5005):
     sa = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sa.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sa.connect((host, port))
@@ -93,4 +93,5 @@ def main(host='54.187.46.146', port=5005):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, message='%(asctime)s %(message)s')
-    main(*addr_from_args(sys.argv))
+    # main(*addr_from_args(sys.argv))
+    main()

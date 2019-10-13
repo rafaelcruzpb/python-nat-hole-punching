@@ -13,7 +13,7 @@ def listen(sock):
         data, addr = sock.recvfrom(1024)
         print('RECEIVED: {}'.format(addr))
 
-def main(host='45.77.74.113', port=9999):
+def main(host='3.15.42.116', port=9999):
     print('connecting: {}:{}'.format(host, port))
     sock = socket.socket(socket.AF_INET, # Internet
                          socket.SOCK_DGRAM) # UDP
