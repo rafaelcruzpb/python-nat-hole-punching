@@ -34,6 +34,8 @@ def accept(port):
 def connect(local_addr, addr, order):
     core_file = '/home/$USER/.var/app/org.libretro.RetroArch/config/retroarch/cores/snes9x_libretro.so'
     rom_file = '~/Downloads/sf2.zip'
+    cmd_host = 'org.libretro.RetroArch --host --port={} -L {} {}'
+    cmd_client = 'org.libretro.RetroArch --connect={} --port={} -L {} {}'
 
     logger.info("connect from %s to %s", local_addr, addr)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,13 +53,19 @@ def connect(local_addr, addr, order):
         else:
             logger.info("connected from %s to %s success!", local_addr, addr)
             STOP.set()
+            order = order.decode("utf-8")
             logger.info('ORDER: %s', order)
-            if order.decode("utf-8") == 1:
+            if order == '1':
                 logger.info("Starting as host... port: %s", local_addr[1])
-                subprocess.run(['org.libretro.RetroArch', '--host', '--port={}'.format(local_addr[1]), '-L {}'.format(core_file), rom_file])
+                cmd = cmd_host.format(local_addr[1], core_file, rom_file)
+                logger.info("Running: {}".format(cmd))
+                p = subprocess.Popen(cmd, shell=True)
+                sys.exit(0)
             else:
-                logger.info("Connecting to host %s:%s", addr[0], addr[1]) 
-                subprocess.run(['org.libretro.RetroArch', '--connect={}'.format(addr[0]), '--port={}'.format(addr[1]), '-L {}'.format(core_file), rom_file])
+                logger.info("Connecting to host %s:%s", addr[0], addr[1])
+                cmd = cmd_client.format(addr[0], addr[1], core_file, rom_file)
+                logger.info("Running: {}".format(cmd))
+                subprocess.Popen(cmd_client, shell=True)
 
 
 def main(host='3.15.42.116', port=5005):
